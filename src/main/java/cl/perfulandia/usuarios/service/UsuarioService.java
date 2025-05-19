@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import cl.perfulandia.usuarios.model.Rol;
 import cl.perfulandia.usuarios.model.Usuario;
 import cl.perfulandia.usuarios.repository.RolRepository;
 import cl.perfulandia.usuarios.repository.UsuarioRepository;
 
+@Service
 public class UsuarioService {
     
     @Autowired
