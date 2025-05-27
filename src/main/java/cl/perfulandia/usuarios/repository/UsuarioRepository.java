@@ -10,5 +10,4 @@ import cl.perfulandia.usuarios.model.Usuario;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByUsername(String username);
     List<Usuario> findByRol_Nombre(String nombreRol);
-    Optional<Usuario> findById(Long id);
 }
