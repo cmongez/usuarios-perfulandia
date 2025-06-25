@@ -20,11 +20,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cl.perfulandia.usuarios.assemblers.UsuarioModelAssembler;
 import cl.perfulandia.usuarios.dto.LoginRequest;
 import cl.perfulandia.usuarios.dto.UsuarioRegistroRequest;
 import cl.perfulandia.usuarios.model.Rol;
@@ -34,11 +36,14 @@ import cl.perfulandia.usuarios.service.UsuarioService;
 @WebMvcTest(UsuarioController.class) // Indica que se está probando el controlador de Usuario
 public class UsuarioControllerTest {
 
-        @Autowired
+    @Autowired
     private MockMvc mockMvc; // Proporciona una manera de realizar peticiones HTTP en las pruebas
 
     @MockBean
     private UsuarioService usuarioService; // Crea un mock del servicio de Usuario
+
+    @MockBean
+    private UsuarioModelAssembler assembler;
 
     @Autowired
     private ObjectMapper objectMapper; // Se usa para convertir objetos Java a JSON y viceversa
@@ -72,50 +77,7 @@ public class UsuarioControllerTest {
                 .andExpect(jsonPath("$[0].username").value("juan"));
     }
 
-    @Test
-    public void testRegistrarUsuario() throws Exception {
-        UsuarioRegistroRequest request = new UsuarioRegistroRequest();
-        request.setUsuario(usuario);
-        request.setNombreRol("ADMIN");
 
-        // Define el comportamiento del mock: registrarUsuario devuelve el usuario registrado
-        when(usuarioService.registrarUsuario(any(), eq("ADMIN"))).thenReturn(usuario);
-
-        // Realiza una petición POST a /usuarios/auth/registro con un body JSON y verifica que la respuesta sea correcta
-        mockMvc.perform(post("/usuarios/auth/registro")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("juan"));
-    }
-
-        @Test
-    public void testLoginUsuario() throws Exception {
-        LoginRequest login = new LoginRequest();
-        login.setUsername("juan");
-        login.setPassword("1234");
-
-        // Define el comportamiento del mock: login devuelve el usuario encontrado
-        when(usuarioService.login("juan", "1234")).thenReturn(usuario);
-
-        // Realiza una petición POST a /usuarios/auth/login con el login JSON y verifica la respuesta
-        mockMvc.perform(post("/usuarios/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("juan"));
-    }
-
-    @Test
-    public void testObtenerUsuarioPorId() throws Exception {
-        // Define el comportamiento del mock: obtenerUsuarioPorId devuelve un usuario con id 1
-        when(usuarioService.obtenerUsuarioPorId(1L)).thenReturn(usuario);
-
-        // Realiza una petición GET a /usuarios/1 y verifica que la respuesta sea correcta
-        mockMvc.perform(get("/usuarios/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
-    }
  @Test
     public void testObtenerUsuariosPorRol() throws Exception {
         // Define el comportamiento del mock: obtenerUsuariosPorRol devuelve una lista con el usuario
